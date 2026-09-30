@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urban Nepal Helper - Trusted Local Home Services in Nepal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        },
+                        nepalRed: '#dc2626',
+                        esewa: '#60bb46',
+                        khalti: '#5c2d91'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="h-full text-slate-800 flex flex-col justify-between">
+
+<header id="app-header" class="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Top bar with Role Switcher & Branding -->
+        <div class="flex items-center justify-between h-16">
+            <!-- Logo & City Selector -->
+            <div class="flex items-center space-x-3">
+                <div onclick="switchRole('customer')" class="cursor-pointer flex items-center space-x-2">
+                    <div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                        UN
+                    </div>
+                    <div>
+                        <span class="font-bold text-lg text-slate-900 tracking-tight flex items-center gap-1">
+                            Urban Nepal <span class="text-xs px-2 py-0.5 bg-brand-100 text-brand-800 font-semibold rounded-full">Helper</span>
+                        </span>
+                        <p class="text-[10px] text-slate-500 font-medium leading-none">Nepal's Local Service App</p>
+                    </div>
+                </div>
+
+                <!-- Location Selector Widget -->
+                <div class="hidden sm:flex items-center ml-4 pl-4 border-l border-slate-200">
+                    <i data-lucide="map-pin" class="w-4 h-4 text-brand-600 mr-1.5"></i>
+                    <select id="header-location-select" onchange="updateSelectedLocation(this.value)" class="text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 py-1.5 px-2.5 rounded-lg border-0 focus:ring-2 focus:ring-brand-500 transition-all cursor-pointer">
+                        <option value="Bharatpur > Narayangarh">Bharatpur → Narayangarh</option>
+                        <option value="Bharatpur > Hakim Chowk" selected>Bharatpur → Hakim Chowk</option>
+                        <option value="Bharatpur > Lions Chowk">Bharatpur → Lions Chowk</option>
+                        <option value="Bharatpur > Kshetrapur">Bharatpur → Kshetrapur</option>
+                        <option value="Bharatpur > Chaubiskothi">Bharatpur → Chaubiskothi</option>
+                        <option value="Bharatpur > Bharatpur Height">Bharatpur → Bharatpur Height</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Role Selector Pills -->
+            <div class="flex items-center space-x-1 sm:space-x-2 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                <button id="role-btn-customer" onclick="switchRole('customer')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 bg-white text-brand-700 shadow-sm">
+                    <i data-lucide="user" class="w-3.5 h-3.5"></i> Customer
+                </button>
+                <button id="role-btn-pro" onclick="switchRole('pro')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 text-slate-600 hover:text-slate-900">
+                    <i data-lucide="wrench" class="w-3.5 h-3.5"></i> Professional
+                </button>
+                <button id="role-btn-admin" onclick="switchRole('admin')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 text-slate-600 hover:text-slate-900">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Admin
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Container -->
+<main id="main-content" class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 mb-16 sm:mb-6">
+    
+    <!-- ====================================
+         1. CUSTOMER VIEW
+         ==================================== -->
+    <div id="view-customer" class="space-y-6">
+        <!-- Hero Banner -->
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-800 to-brand-600 text-white p-6 sm:p-10 shadow-lg">
+            <div class="relative z-10 max-w-2xl">
+                <div class="inline-flex items-center gap-2 bg-brand-700/60 backdrop-blur px-3 py-1 rounded-full text-xs font-medium text-brand-100 mb-3 border border-brand-500/30">
+                    <i data-lucide="check-circle2" class="w-3.5 h-3.5 text-brand-100"></i> Local & Verified Professionals in Bharatpur
+                </div>
+                <h1 class="text-2xl sm:text-4xl font-bold tracking-tight text-white mb-2">
+                    Need a trusted professional? We'll help you find one.
+                </h1>
+                <p class="text-slate-100 text-sm sm:text-base mb-6 font-normal">
+                    Electrician, plumber, appliance repair, cleaning, carpentry & mobile service — all with verified pricing & background check.
+                </p>
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="scrollToCategories()" class="bg-white text-brand-800 hover:bg-brand-50 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all flex items-center gap-2">
+                        <i data-lucide="search" class="w-4 h-4"></i> Find a Service
+                    </button>
+                    <button onclick="switchRole('pro')" class="bg-brand-900/40 hover:bg-brand-900/60 text-white border border-white/20 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
+                        <i data-lucide="briefcase" class="w-4 h-4"></i> Join as a Professional
+                    </button>
+                </div>
+            </div>
+            <div class="absolute -right-10 -bottom-10 opacity-15 text-white pointer-events-none hidden md:block">
+                <i data-lucide="wrench" class="w-96 h-96"></i>
+            </div>
+        </div>
+
+        <!-- Location Mobile Selector Bar -->
+        <div class="sm:hidden bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <span class="text-xs text-slate-500 font-medium">Your City Locality:</span>
+            <select onchange="updateSelectedLocation(this.value)" class="text-xs font-bold text-brand-800 bg-brand-50 border-0 rounded-lg py-1 px-2">
+                <option value="Bharatpur > Narayangarh">Bharatpur → Narayangarh</option>
+                <option value="Bharatpur > Hakim Chowk" selected>Bharatpur → Hakim Chowk</option>
+                <option value="Bharatpur > Lions Chowk">Bharatpur → Lions Chowk</option>
+                <option value="Bharatpur > Kshetrapur">Bharatpur → Kshetrapur</option>
+            </select>
+        </div>
+
+        <!-- Category Section Header -->
+        <div id="services-grid-anchor" class="flex items-center justify-between pt-2">
+            <div>
+                <h2 class="text-xl font-bold text-slate-900">Explore Services</h2>
+                <p class="text-xs text-slate-500">Transparent starting prices • Guaranteed service standard</p>
+            </div>
+            <div class="relative w-48 sm:w-64">
+                <input type="text" id="category-search-input" oninput="filterCategories(this.value)" placeholder="Search repair, plumbing..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
+            </div>
+        </div>
+
+        <!-- Service Categories Grid -->
+        <div id="categories-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            <!-- Javascript dynamically fills categories -->
+        </div>
+
+        <!-- Active Booking Banner (if any) -->
+        <div id="customer-active-booking-container" class="hidden">
+            <!-- Dynamic Active Booking Progress Widget -->
+        </div>
+
+        <!-- Featured Nearby Top-Rated Workers -->
+        <div class="space-y-3 pt-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">Verified Professionals Near You</h2>
+                    <p class="text-xs text-slate-500">Based in Bharatpur locality with verified citizenship & credentials</p>
+                </div>
+                <button onclick="openBookingWizard('Electrical')" class="text-xs font-bold text-brand-700 hover:text-brand-800">
+                    View All →
+                </button>
+            </div>
+            
+            <div id="featured-workers-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Javascript will dynamically render workers -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================
+         2. SERVICE PROFESSIONAL VIEW
+         ==================================== -->
+    <div id="view-pro" class="hidden space-y-6">
+        <!-- Pro Banner Header -->
+        <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <img id="pro-header-avatar" src="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=150&auto=format&fit=crop&q=80" class="w-16 h-16 rounded-2xl object-cover border-2 border-brand-500">
+                    <span id="pro-online-badge" class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-slate-900 rounded-full"></span>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h2 id="pro-header-name" class="text-xl font-bold">Ram Thapa</h2>
+                        <span class="bg-brand-500/20 text-brand-300 text-xs px-2 py-0.5 rounded border border-brand-500/30 font-semibold">Master Electrician</span>
+                    </div>
+                    <p id="pro-header-sub" class="text-xs text-slate-400">Bharatpur-10, Hakim Chowk • 342 Jobs Done</p>
+                    <div class="flex items-center gap-3 mt-1 text-xs text-slate-300">
+                        <span class="flex items-center gap-1 text-amber-400 font-bold"><i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i> 4.9</span>
+                        <span>•</span>
+                        <span class="text-emerald-400 font-medium">Identity & Skill Verified ✓</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pro Actions & Availability Toggle -->
+            <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end border-t border-slate-800 md:border-0 pt-3 md:pt-0">
+                <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">
+                    <span class="text-xs font-semibold text-slate-300">Duty Status:</span>
+                    <button id="toggle-duty-btn" onclick="toggleProDuty()" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500 text-white transition-all">
+                        ONLINE
+                    </button>
+                </div>
+                <button onclick="openProKycModal()" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-brand-600 text-white hover:bg-brand-500 transition-all flex items-center gap-1">
+                    <i data-lucide="file-check-2" class="w-3.5 h-3.5"></i> KYC Status
+                </button>
+            </div>
+        </div>
+
+        <!-- Pro Dashboard Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex justify-between items-center text-slate-400 mb-1">
+                    <span class="text-xs font-medium">Today's Jobs</span>
+                    <i data-lucide="calendar" class="w-4 h-4 text-brand-600"></i>
+                </div>
+                <div class="text-2xl font-bold text-slate-900">2 Active</div>
+                <p class="text-[11px] text-slate-500 mt-1">1 in Narayangarh, 1 Hakim Chowk</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex justify-between items-center text-slate-400 mb-1">
+                    <span class="text-xs font-medium">Pending Requests</span>
+                    <i data-lucide="bell" class="w-4 h-4 text-amber-500"></i>
+                </div>
+                <div id="pro-pending-count" class="text-2xl font-bold text-amber-600">1 Request</div>
+                <p class="text-[11px] text-slate-500 mt-1">Action required in 15 mins</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex justify-between items-center text-slate-400 mb-1">
+                    <span class="text-xs font-medium">Earnings (This Week)</span>
+                    <i data-lucide="wallet" class="w-4 h-4 text-emerald-600"></i>
+                </div>
+                <div class="text-2xl font-bold text-slate-900">Rs. 12,450</div>
+                <p class="text-[11px] text-emerald-600 font-medium mt-1">+18% vs last week</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex justify-between items-center text-slate-400 mb-1">
+                    <span class="text-xs font-medium">Worker Rating</span>
+                    <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400"></i>
+                </div>
+                <div class="text-2xl font-bold text-slate-900">4.92 / 5</div>
+                <p class="text-[11px] text-slate-500 mt-1">128 Customer Reviews</p>
+            </div>
+        </div>
+
+        <!-- Pro Main Operational Tabs -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left 2 Cols: Incoming Requests & Active Work -->
+            <div class="lg:col-span-2 space-y-4">
+                <!-- Incoming Request Section -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                    <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                        New Job Invitations
+                    </h3>
+                    <div id="pro-incoming-job-card">
+                        <!-- Dynamic job request injected via JS -->
+                    </div>
+                </div>
+
+                <!-- Ongoing Active Jobs -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                    <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center justify-between">
+                        <span>Current Work Lifecycle Manager</span>
+                        <span class="text-xs text-brand-600 font-normal">Updated live</span>
+                    </h3>
+                    <div id="pro-active-job-manager">
+                        <!-- Dynamic active job control panel -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Col: Wallet & Quick Settings -->
+            <div class="space-y-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="text-sm font-bold text-slate-900 mb-3">Nepal Digital Wallet Balance</h3>
+                    <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-4 rounded-xl mb-3">
+                        <span class="text-xs text-slate-400 block mb-1">Withdrawable Net Balance</span>
+                        <div class="text-2xl font-bold">Rs. 8,750.00</div>
+                        <p class="text-[10px] text-slate-400 mt-2">10% Platform fee automatically deducted</p>
+                    </div>
+                    <div class="space-y-2">
+                        <button onclick="triggerWithdraw('eSewa')" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs flex items-center justify-center gap-2">
+                            Withdraw to eSewa Mobile Wallet
+                        </button>
+                        <button onclick="triggerWithdraw('Khalti')" class="w-full py-2 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-lg text-xs flex items-center justify-center gap-2">
+                            Withdraw to Khalti / Bank
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                    <h3 class="text-sm font-bold text-slate-900">Service Coverage Settings</h3>
+                    <div>
+                        <label class="text-xs text-slate-500 font-medium">Base Starting Fee (NPR)</label>
+                        <input type="number" id="pro-base-fee-input" value="500" class="w-full mt-1 p-2 border border-slate-200 rounded-lg text-xs font-semibold">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-500 font-medium">Coverage Radius (Bharatpur)</label>
+                        <select class="w-full mt-1 p-2 border border-slate-200 rounded-lg text-xs font-semibold">
+                            <option>5 km (Narayangarh & Central)</option>
+                            <option selected>10 km (Whole Metropolitan City)</option>
+                            <option>15 km (Includes Ratnanagar)</option>
+                        </select>
+                    </div>
+                    <button onclick="showToast('Settings saved successfully!')" class="w-full py-2 bg-slate-800 text-white rounded-lg text-xs font-semibold hover:bg-slate-900">
+                        Update Rate & Radius
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================
+         3. ADMIN DASHBOARD VIEW
+         ==================================== -->
+    <div id="view-admin" class="hidden space-y-6">
+        <!-- Admin KPI Section Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">Platform Control & Analytics</h1>
+                <p class="text-xs text-slate-500">Urban Nepal Helper • Bharatpur City Launch Control</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Live System Healthy
+                </span>
+            </div>
+        </div>
+
+        <!-- KPI Summary Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <span class="text-xs text-slate-500 font-medium">Total Registered Users</span>
+                <div class="text-2xl font-bold text-slate-900 mt-1">1,420</div>
+                <div class="text-[11px] text-slate-500 mt-1">1,280 Customers • 140 Workers</div>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <span class="text-xs text-slate-500 font-medium">Active Workers (Verified)</span>
+                <div class="text-2xl font-bold text-brand-700 mt-1">86 Pros</div>
+                <div class="text-[11px] text-amber-600 font-medium mt-1">4 Verifications Pending</div>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <span class="text-xs text-slate-500 font-medium">Completed Bookings</span>
+                <div class="text-2xl font-bold text-slate-900 mt-1">3,890</div>
+                <div class="text-[11px] text-emerald-600 font-medium mt-1">98.2% Completion Rate</div>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <span class="text-xs text-slate-500 font-medium">Gross GMV / Net Commission</span>
+                <div class="text-xl font-bold text-slate-900 mt-1">Rs. 2.4M / Rs. 240K</div>
+                <div class="text-[11px] text-slate-500 mt-1">Platform Commission Fee: 10%</div>
+            </div>
+        </div>
+
+        <!-- Commission Rate Slider & Analytics Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Chart Container -->
+            <div class="lg:col-span-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-slate-900">Weekly Booking & Revenue Trends (Bharatpur)</h3>
+                    <select class="text-xs border border-slate-200 rounded-lg p-1 bg-slate-50">
+                        <option>Last 7 Days</option>
+                        <option>Last 30 Days</option>
+                    </select>
+                </div>
+                <!-- SVG Custom Responsive Chart -->
+                <div class="h-48 w-full">
+                    <svg class="w-full h-full" viewBox="0 0 500 150" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#0d9488" stop-opacity="0.4"/>
+                                <stop offset="100%" stop-color="#0d9488" stop-opacity="0.0"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Grid lines -->
+                        <line x1="0" y1="30" x2="500" y2="30" stroke="#f1f5f9" stroke-width="1"/>
+                        <line x1="0" y1="75" x2="500" y2="75" stroke="#f1f5f9" stroke-width="1"/>
+                        <line x1="0" y1="120" x2="500" y2="120" stroke="#f1f5f9" stroke-width="1"/>
+                        
+                        <!-- Area -->
+                        <path d="M0,120 Q70,40 140,80 T280,30 T420,70 T500,20 L500,150 L0,150 Z" fill="url(#chartGrad)" />
+                        <!-- Line -->
+                        <path d="M0,120 Q70,40 140,80 T280,30 T420,70 T500,20" fill="none" stroke="#0d9488" stroke-width="3"/>
+                        
+                        <!-- Points -->
+                        <circle cx="140" cy="80" r="4" fill="#0d9488" />
+                        <circle cx="280" cy="30" r="4" fill="#0d9488" />
+                        <circle cx="420" cy="70" r="4" fill="#0d9488" />
+                    </svg>
+                </div>
+                <div class="flex justify-between text-[11px] text-slate-400 pt-1">
+                    <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                </div>
+            </div>
+
+            <!-- Commission Controls & City Manager -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <h3 class="text-sm font-bold text-slate-900">Platform Business Settings</h3>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-semibold text-slate-700">Platform Commission Rate</label>
+                        <span id="commission-display-val" class="text-xs font-bold text-brand-700">10%</span>
+                    </div>
+                    <input type="range" min="5" max="25" value="10" id="commission-slider" oninput="updateCommissionRate(this.value)" class="w-full accent-brand-600">
+                    <p class="text-[10px] text-slate-400 mt-1">Automatically applied to total job quote.</p>
+                </div>
+
+                <hr class="border-slate-100">
+
+                <div>
+                    <h4 class="text-xs font-bold text-slate-900 mb-2">City Expansion & Operational Status</h4>
+                    <div class="space-y-1.5 max-h-32 overflow-y-auto pr-1">
+                        <div class="flex items-center justify-between text-xs p-1.5 bg-slate-50 rounded">
+                            <span class="font-semibold text-slate-800">Bharatpur (Demo MVP)</span>
+                            <span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">Active</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs p-1.5 bg-slate-50 rounded">
+                            <span class="font-semibold text-slate-800">Kathmandu Valley</span>
+                            <span class="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded">Ready</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs p-1.5 bg-slate-50 rounded">
+                            <span class="font-semibold text-slate-800">Pokhara</span>
+                            <span class="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded">Planned</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verification Queue Section -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-900">Worker Verification Queue</h3>
+                    <p class="text-xs text-slate-500">Review Citizenship ID and Professional Skill Certificates</p>
+                </div>
+                <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">4 Pending</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-600">
+                    <thead class="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                        <tr>
+                            <th class="p-2.5">Worker Name</th>
+                            <th class="p-2.5">Category</th>
+                            <th class="p-2.5">Citizenship #</th>
+                            <th class="p-2.5">Documents</th>
+                            <th class="p-2.5">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-verification-table-body" class="divide-y divide-slate-100">
+                        <!-- Javascript injects pending workers -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<!-- ====================================
+     4. MODALS & POPUPS
+     ==================================== -->
+
+<!-- Booking Wizard Modal -->
+<div id="booking-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden">
+    <div class="bg-white w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <!-- Header -->
+        <div class="bg-slate-900 text-white p-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span id="booking-modal-icon-bg" class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white">
+                    <i data-lucide="wrench" class="w-4 h-4"></i>
+                </span>
+                <div>
+                    <h3 id="booking-modal-title" class="font-bold text-sm">Book Electrical Service</h3>
+                    <p class="text-[11px] text-slate-400">Step <span id="wizard-step-num">1</span> of 3</p>
+                </div>
+            </div>
+            <button onclick="closeBookingModal()" class="text-slate-400 hover:text-white">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- Wizard Step Body -->
+        <div class="p-5 overflow-y-auto space-y-4 flex-1" id="wizard-step-container">
+            <!-- Dynamic step contents rendered via JS -->
+        </div>
+
+        <!-- Wizard Footer -->
+        <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+            <button id="wizard-prev-btn" onclick="wizardStepBack()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 border border-slate-300 rounded-xl bg-white hidden">
+                ← Back
+            </button>
+            <div class="ml-auto flex items-center gap-2">
+                <button id="wizard-next-btn" onclick="wizardStepNext()" class="px-5 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow">
+                    Continue →
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Worker Profile Deep View Modal -->
+<div id="worker-profile-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+        <div id="worker-profile-content" class="overflow-y-auto p-5 space-y-4">
+            <!-- Dynamic Content -->
+        </div>
+        <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
+            <button onclick="closeWorkerProfileModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-white border border-slate-300 rounded-xl">Close</button>
+            <button id="profile-direct-book-btn" class="px-4 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl">Book This Professional</button>
+        </div>
+    </div>
+</div>
+
+<!-- Live Chat Modal -->
+<div id="chat-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[500px]">
+        <!-- Chat Header -->
+        <div class="bg-slate-900 text-white p-3.5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img id="chat-worker-avatar" src="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=150" class="w-9 h-9 rounded-full object-cover border border-brand-500">
+                <div>
+                    <h4 id="chat-worker-name" class="font-bold text-xs">Ram Thapa</h4>
+                    <span class="text-[10px] text-emerald-400 font-medium">Online • Active Booking #UN-9082</span>
+                </div>
+            </div>
+            <button onclick="closeChatModal()" class="text-slate-400 hover:text-white">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- Chat Stream -->
+        <div id="chat-messages-body" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50 text-xs">
+            <!-- Messages dynamic -->
+        </div>
+
+        <!-- Chat Input -->
+        <div class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
+            <button onclick="sendQuickPhotoChat()" class="text-slate-400 hover:text-brand-600 p-1.5 rounded-lg bg-slate-100">
+                <i data-lucide="camera" class="w-4 h-4"></i>
+            </button>
+            <input type="text" id="chat-input-text" placeholder="Type message or address landmark..." class="flex-1 text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500" onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button onclick="sendChatMessage()" class="bg-brand-600 text-white p-2 rounded-xl hover:bg-brand-700">
+                <i data-lucide="send" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- KYC Verification Upload Modal (Worker Role) -->
+<div id="pro-kyc-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-5 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+            <h3 class="font-bold text-sm text-slate-900">Worker Verification Documents</h3>
+            <button onclick="closeProKycModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <div class="space-y-3 text-xs">
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1">Nepal Citizenship Card (Nagarikta ID)</label>
+                <div class="border-2 border-dashed border-slate-200 rounded-xl p-3 text-center bg-slate-50 hover:bg-slate-100 cursor-pointer">
+                    <i data-lucide="upload-cloud" class="w-6 h-6 text-slate-400 mx-auto mb-1"></i>
+                    <span class="text-[11px] text-slate-500">Upload Front/Back citizenship scan</span>
+                </div>
+            </div>
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1">Technical Skill / Trade Certificate (Optional)</label>
+                <div class="border-2 border-dashed border-slate-200 rounded-xl p-3 text-center bg-slate-50 hover:bg-slate-100 cursor-pointer">
+                    <i data-lucide="award" class="w-6 h-6 text-slate-400 mx-auto mb-1"></i>
+                    <span class="text-[11px] text-slate-500">CTEVT / Electrical / Plumbing Certificate</span>
+                </div>
+            </div>
+        </div>
+        <button onclick="submitKycDocs()" class="w-full py-2 bg-brand-600 text-white rounded-xl text-xs font-bold hover:bg-brand-700">
+            Submit Documents for Admin Approval
+        </button>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container" class="fixed bottom-20 sm:bottom-6 right-4 z-50 space-y-2 pointer-events-none"></div>
+
+<!-- Mobile Bottom Sticky Navigation -->
+<div class="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40 px-6 py-2 flex justify-between items-center text-[10px] font-medium text-slate-500 shadow-lg">
+    <button onclick="switchRole('customer')" class="flex flex-col items-center gap-0.5 text-brand-700 font-bold">
+        <i data-lucide="home" class="w-5 h-5"></i>
+        <span>Home</span>
+    </button>
+    <button onclick="openCustomerActiveBookingsModal()" class="flex flex-col items-center gap-0.5 hover:text-brand-600">
+        <i data-lucide="calendar" class="w-5 h-5"></i>
+        <span>Bookings</span>
+    </button>
+    <button onclick="openChatModal(currentActiveWorkerId || 1)" class="flex flex-col items-center gap-0.5 hover:text-brand-600">
+        <i data-lucide="message-square" class="w-5 h-5"></i>
+        <span>Messages</span>
+    </button>
+    <button onclick="switchRole('pro')" class="flex flex-col items-center gap-0.5 hover:text-brand-600">
+        <i data-lucide="user" class="w-5 h-5"></i>
+        <span>Pro Desk</span>
+    </button>
+</div>
+
+<script>
+/* ==========================================================================
+   1. DATA STORE (10 Realistic Workers in Bharatpur & Services Setup)
+   ========================================================================== */
+
+const SERVICES_DATA = [
+    { id: 'electrical', name: 'Electrical', icon: 'zap', desc: 'Wiring, switches, ceiling fan, MCB', starting: 500 },
+    { id: 'plumbing', name: 'Plumbing', icon: 'droplet', desc: 'Pipe leakages, tap repair, water tank', starting: 500 },
+    { id: 'ac', name: 'AC Repair', icon: 'snowflake', desc: 'AC servicing, gas refill, installation', starting: 1200 },
+    { id: 'washing', name: 'Washing Machine', icon: 'washing-machine', desc: 'Drum repair, power issue, motor fix', starting: 800 },
+    { id: 'refrigerator', name: 'Refrigerator', icon: 'box', desc: 'Cooling issues, compressor, door seal', starting: 700 },
+    { id: 'computer', name: 'Computer/Laptop', icon: 'laptop', desc: 'Windows OS, hardware repair, clean', starting: 600 },
+    { id: 'mobile', name: 'Mobile Repair', icon: 'smartphone', desc: 'Screen replacement, battery, port', starting: 500 },
+    { id: 'carpenter', name: 'Carpentry', icon: 'hammer', desc: 'Door hinges, furniture repair, lock', starting: 600 },
+    { id: 'painting', name: 'Painting', icon: 'paint-bucket', desc: 'Wall touchups, room painting, coat', starting: 1500 },
+    { id: 'cleaning', name: 'Cleaning', icon: 'sparkles', desc: 'Full house deep clean, bathroom', starting: 2000 },
+    { id: 'moving', name: 'Moving & Shifting', icon: 'truck', desc: 'Local room & home shifting service', starting: 3000 },
+    { id: 'handyman', name: 'Handyman', icon: 'wrench', desc: 'Drilling, TV mounting, curtan rod', starting: 400 }
+];
+
+const SUB_SERVICES_MAP = {
+    'Electrical': ['Ceiling/Exhaust Fan Repair', 'Switch & Socket Replacement', 'Inverter Wiring & Battery setup', 'MCB Trip & Circuit Breaker', 'Light / Chandelier Installation', 'Other Electrical Problem'],
+    'Plumbing': ['Tap & Mixer Leakage', 'Commode / Toilet Tank Repair', 'Water Tank Cleaning & Fitting', 'Pipe Blockage Removal', 'Basin Installation'],
+    'AC Repair': ['General Jet Servicing', 'Gas Refilling (R32/R410)', 'AC Mounting & Uninstallation', 'PCB Repair'],
+    'Washing Machine': ['Water Draining Problem', 'Drum Vibration / Sound', 'Power Supply PCB Failure'],
+    'Refrigerator': ['Not Cooling / Frosting Issue', 'Gas Leak & Refill', 'Thermostat Replacement'],
+    'Computer/Laptop': ['SSD Upgrade & Windows Install', 'Display Replacement', 'Laptop Overheating Servicing'],
+    'Mobile Repair': ['Display Screen Replacement', 'Battery Replacement', 'Charging Port Fixing'],
+    'Carpentry': ['Door Lock Installation', 'Wardrobe Drawer Alignment', 'Bed Repair'],
+    'Painting': ['Single Room Wall Touchup', 'Full Interior Painting', 'Dampproofing Treatment'],
+    'Cleaning': ['Full House Deep Clean', 'Bathroom Sanitize Clean', 'Sofa Deep Washing'],
+    'Moving': ['Room Shifting (Local Bharatpur)', 'Full House Shift'],
+    'Handyman': ['Wall Drilling & Mirror Mount', 'Curtain Rod Hanging', 'TV Wall Mount']
+};
+
+let WORKERS = [
+    {
+        id: 1,
+        name: "Ram Thapa",
+        category: "Electrical",
+        subCat: "Master Electrician",
+        locality: "Hakim Chowk, Bharatpur-10",
+        distanceKm: 1.2,
+        rating: 4.9,
+        reviewsCount: 126,
+        jobsCompleted: 342,
+        experienceYears: 8,
+        startingPrice: 500,
+        avatar: "https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=200&auto=format&fit=crop&q=80",
+        phoneVerified: true,
+        identityVerified: true,
+        proVerified: true,
+        topRated: true,
+        bio: "Certified electrical technician with 8 years of experience across Bharatpur. Expert in house wiring, inverter setup, and circuit breaker troubleshooting.",
+        languages: ["Nepali", "Hindi", "English"],
+        availability: "Available Today"
+    },
+    {
+        id: 2,
+        name: "Sunita Gurung",
+        category: "Cleaning",
+        subCat: "Deep Cleaning Expert",
+        locality: "Narayangarh, Ward 2",
+        distanceKm: 2.1,
+        rating: 4.8,
+        reviewsCount: 94,
+        jobsCompleted: 180,
+        experienceYears: 5,
+        startingPrice: 1500,
+        avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&auto=format&fit=crop&q=80",
+        phoneVerified: true,
+        identityVerified: true,
+        proVerified: true,
+        topRated: true,
+        bio: "Specialized team lead for home deep cleaning, kitchen degreasing, and post-construction sanitization using eco-friendly solutions.",
+        languages: ["Nepali", "Gurung"],
+        availability: "Available Tomorrow"
+    },
+    {
+        id: 3,
+        name: "Prakash Shrestha",
+        category: "Plumbing",
+        subCat: "Sanitary & Pipe Specialist",
+        locality: "Lions Chowk",
+        distanceKm: 0.8,
+        rating: 4.7,
+        reviewsCount: 88,
+        jobsCompleted: 210,
+        experienceYears: 6,
+        startingPrice: 500,
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
+        phoneVerified: true,
+        identityVerified: true,
+        proVerified: true,
+        topRated: false,
+        bio: "Fast response emergency plumber around Lions Chowk & Chaubiskothi. Tap repairs, tank fitting, and blockage clearing.",
+        languages: ["Nepali", "Newari", "Hindi"],
+        availability: "Available Today"
+    },
+    {
+        id: 4,
+        name: "Bikash Adhikari",
+        category: "AC Repair",
+        subCat: "HVAC & Cooling Technician",
+        locality: "Bharatpur Height",
+        distanceKm: 3.4,
+        rating: 4.9,
+        reviewsCount: 150,
+        jobsCompleted: 410,
+        experienceYears: 9,
+        startingPrice: 1200,
+        avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80",
+        phoneVerified: true,
+        identityVerified: true,
+        proVerified: true,
+        topRated: true,
+        bio: "CTEVT certified HVAC specialist. Jet pressure AC washing, gas charging, and board repairs.",
+        languages: ["Nepali", "English"],
+        availability: "Available Today"
+    },
+    {
+        id: 5,
+        name: "Raju Bishwakarma",
+        category: "Carpentry",
+        subCat: "Furniture & Door Repair",
+        locality: "Kshetrapur",
+        distanceKm: 1.9,
+        rating: 4.8,
+        reviewsCount: 65,
+        jobsCompleted: 115,
+        experienceYears: 7,
+        startingPrice: 600,
+        avatar: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=200&auto=format&fit=crop&q=80",
+        phoneVerified: true,
+        identityVerified: true,
+        proVerified: false,
+        topRated: false,
+        bio: "Custom wood craftsman and quick fix carpenter for doors, locks, modular cabinets, and bed repairs.",
+        languages: ["Nepali"],
+        availability: "Available Today"
+    },
+    {
+        id: 6,
+        name: "Sarita Rai",
+        category: "Computer",
+        subCat: "Laptop Hardware & OS Specialist",
+        locality: "Chaubiskothi",
+        distanceKm: 0.5,
+        rating: 4.9,
+        reviewsCount: 112,
+        jobsCompleted: 230,
+        experienceYears: 4,
+        startingPrice: 600,
+        avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&auto=format&fit=crop&q=80",
+        phoneVerified: true,
+        identityVerified: true,
+        proVerified: true,
+        topRated: true,
+        bio: "Computer engineering diploma holder. On-site doorstep laptop formatting, SSD upgrades, and motherboard fixes.",
+        languages: ["Nepali", "English"],
+        availability: "Available Today"
+    },
+    {
+        id: 7,
+        name: "Dipendra Chaudhary",
+        category: "Refrigerator",
+        subCat: "Appliance Technician",
+        locality: "Bypass Road, Bharatpur",
+        distanceKm: 2.8,
+        rating: 4.6,
+        reviewsCount: 42,
+        jobsCompleted: 89,
+        experienceYears: 5,
+        startingPrice: 700,
+        avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200&auto=format&fit=crop&q=80",
+        phoneVerified: true,
+        identityVerified: true,
+        proVerified: false,
+        topRated: false,
+        bio: "Expert in single & double door fridge repairs, gas leaks, and washing machine motor troubleshooting.",
+        languages: ["Nepali", "Tharu"],
+        availability: "Available Tomorrow"
+    },
+    {
+        id: 8,
+        name: "Manoj Mahato",
+        category: "Painting",
+        subCat: "Interior Painter",
+        locality: "Ganeshthan",
+        distanceKm: 3.1,
+        rating: 4.8,
+        reviewsCount: 53,
+        jobsCompleted: 98,
+        experienceYears: 10,
+        startingPrice: 1500,
+        avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&auto=format&fit=crop&q=80",
+        phoneVerified: true,
+        identityVerified: true,
+        proVerified: true,
+        topRated: false,
+        bio: "Clean, dust-free interior wall painting, damp treatment, and Asian Paints color consulting.",
+        languages: ["Nepali", "Bhojpuri"],
+        availability: "Available Today"
+    },
+    {
+        id: 9,
+        name: "Anju Karki",
+        category: "Mobile",
+        subCat: "Mobile Screen Specialist",
+        locality: "Narayangarh Market",
+        distanceKm: 1.5,
+        rating: 4.7,
+        reviewsCount: 78,
+        jobsCompleted: 195,
+        experienceYears: 4,
+        startingPrice: 500,
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+        phoneVerified: true,
+        identityVerified: true,
+        proVerified: true,
+        topRated: false,
+        bio: "Doorstep mobile display screen, battery, and charging jack repairs with 3 months warranty.",
+        languages: ["Nepali", "English"],
+        availability: "Available Today"
+    },
+    {
+        id: 10,
+        name: "Ramesh Silwal",
+        category: "Moving",
+        subCat: "Local Shifting Lead",
+        locality: "Hakim Chowk",
+        distanceKm: 1.0,
+        rating: 4.9,
+        reviewsCount: 160,
+        jobsCompleted: 310,
+        experienceYears: 7,
+        startingPrice: 3000,
+        avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80",
+        phoneVerified: true,
+        identityVerified: true,
+        proVerified: true,
+        topRated: true,
+        bio: "Punctual room and office shifting with pickup van, bubble wrap packaging, and careful loading.",
+        languages: ["Nepali"],
+        availability: "Available Today"
+    }
+];
+
+// App State
+let currentRole = 'customer';
+let selectedLocation = 'Bharatpur > Hakim Chowk';
+let currentPlatformCommission = 10; // 10%
+let activeBooking = null;
+let currentActiveWorkerId = 1;
+
+// Booking Wizard State
+let wizardData = {
+    step: 1,
+    category: 'Electrical',
+    subService: '',
+    description: '',
+    photoUploaded: false,
+    address: 'Hakim Chowk, Ward 10, Bharatpur',
+    time: 'ASAP',
+    selectedWorker: null
+};
+
+// Pending Verification Queue for Admin
+let pendingVerifications = [
+    { id: 101, name: "Narayan Prasad", category: "Handyman", citizenship: "38-01-78-04921", docs: "Citizenship_Front.jpg" },
+    { id: 102, name: "Kopila Sharma", category: "Cleaning", citizenship: "38-02-74-11029", docs: "Nagarikta_Scan.pdf" },
+    { id: 103, name: "Suman Shrestha", category: "Plumbing", citizenship: "38-01-79-00122", docs: "Trade_Cert_CTEVT.png" }
+];
+
+/* ==========================================================================
+   2. INITIALIZATION & UI SWITCHERS
+   ========================================================================== */
+
+window.onload = function() {
+    renderCategoriesGrid();
+    renderFeaturedWorkers();
+    renderProIncomingRequest();
+    renderAdminVerificationQueue();
+    lucide.createIcons();
+};
+
+function switchRole(role) {
+    currentRole = role;
+    
+    // Hide all views
+    document.getElementById('view-customer').classList.add('hidden');
+    document.getElementById('view-pro').classList.add('hidden');
+    document.getElementById('view-admin').classList.add('hidden');
+
+    // Update buttons UI
+    ['customer', 'pro', 'admin'].forEach(r => {
+        const btn = document.getElementById(`role-btn-${r}`);
+        if(r === role) {
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 bg-white text-brand-700 shadow-sm";
+        } else {
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 text-slate-600 hover:text-slate-900";
+        }
+    });
+
+    // Show target view
+    if(role === 'customer') {
+        document.getElementById('view-customer').classList.remove('hidden');
+    } else if(role === 'pro') {
+        document.getElementById('view-pro').classList.remove('hidden');
+        renderProActiveJobPanel();
+    } else if(role === 'admin') {
+        document.getElementById('view-admin').classList.remove('hidden');
+    }
+    
+    showToast(`Switched view to ${role.toUpperCase()} Mode`);
+    lucide.createIcons();
+}
+
+function updateSelectedLocation(val) {
+    selectedLocation = val;
+    wizardData.address = val.replace('Bharatpur > ', '') + ', Bharatpur';
+    showToast(`Location set to: ${val}`);
+}
+
+function showToast(msg) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'bg-slate-900 text-white text-xs px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 border border-slate-700 transform transition-all duration-300 translate-y-2';
+    toast.innerHTML = `<i data-lucide="info" class="w-4 h-4 text-brand-400"></i> ${msg}`;
+    container.appendChild(toast);
+    lucide.createIcons();
+    
+    setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-4');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+/* ==========================================================================
+   3. CUSTOMER VIEW & CATEGORY RENDERING
+   ========================================================================== */
+
+function renderCategoriesGrid() {
+    const grid = document.getElementById('categories-grid');
+    grid.innerHTML = SERVICES_DATA.map(s => `
+        <div onclick="openBookingWizard('${s.name}')" class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md hover:border-brand-500 transition-all cursor-pointer flex flex-col justify-between group">
+            <div>
+                <div class="w-9 h-9 rounded-xl bg-brand-50 text-brand-700 group-hover:bg-brand-600 group-hover:text-white flex items-center justify-center transition-colors mb-2">
+                    <i data-lucide="${s.icon}" class="w-5 h-5"></i>
+                </div>
+                <h3 class="font-bold text-xs text-slate-900 mb-0.5">${s.name}</h3>
+                <p class="text-[10px] text-slate-500 line-clamp-2 leading-tight">${s.desc}</p>
+            </div>
+            <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px]">
+                <span class="text-slate-400">From</span>
+                <span class="font-bold text-brand-700">Rs. ${s.starting}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function filterCategories(query) {
+    const q = query.toLowerCase();
+    const filtered = SERVICES_DATA.filter(s => s.name.toLowerCase().includes(q) || s.desc.toLowerCase().includes(q));
+    const grid = document.getElementById('categories-grid');
+    if(filtered.length === 0) {
+        grid.innerHTML = `<p class="col-span-full text-center text-xs text-slate-400 py-4">No services matching "${query}"</p>`;
+        return;
+    }
+    grid.innerHTML = filtered.map(s => `
+        <div onclick="openBookingWizard('${s.name}')" class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm hover:border-brand-500 transition-all cursor-pointer flex flex-col justify-between group">
+            <div>
+                <div class="w-9 h-9 rounded-xl bg-brand-50 text-brand-700 group-hover:bg-brand-600 group-hover:text-white flex items-center justify-center transition-colors mb-2">
+                    <i data-lucide="${s.icon}" class="w-5 h-5"></i>
+                </div>
+                <h3 class="font-bold text-xs text-slate-900 mb-0.5">${s.name}</h3>
+                <p class="text-[10px] text-slate-500 line-clamp-2 leading-tight">${s.desc}</p>
+            </div>
+            <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px]">
+                <span class="text-slate-400">From</span>
+                <span class="font-bold text-brand-700">Rs. ${s.starting}</span>
+            </div>
+        </div>
+    `).join('');
+    lucide.createIcons();
+}
+
+function renderFeaturedWorkers() {
+    const container = document.getElementById('featured-workers-list');
+    container.innerHTML = WORKERS.slice(0, 6).map(w => `
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-all space-y-3">
+            <div class="flex items-start justify-between">
+                <div class="flex gap-3">
+                    <img src="${w.avatar}" class="w-12 h-12 rounded-xl object-cover border border-slate-100">
+                    <div>
+                        <h4 class="font-bold text-xs text-slate-900 flex items-center gap-1">
+                            ${w.name}
+                            ${w.topRated ? '<span class="bg-amber-100 text-amber-800 text-[9px] px-1.5 py-0.2 rounded font-bold">Top Rated</span>' : ''}
+                        </h4>
+                        <p class="text-[11px] text-brand-700 font-medium">${w.subCat}</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">${w.locality} • ${w.distanceKm} km away</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="flex items-center gap-1 text-amber-500 text-xs font-bold justify-end">
+                        <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i> ${w.rating}
+                    </div>
+                    <span class="text-[10px] text-slate-400">(${w.reviewsCount} reviews)</span>
+                </div>
+            </div>
+
+            <!-- Verification Badges -->
+            <div class="flex flex-wrap gap-1 text-[10px]">
+                ${w.identityVerified ? '<span class="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">✓ Govt ID Verified</span>' : ''}
+                ${w.proVerified ? '<span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-semibold">✓ Skilled Certified</span>' : ''}
+            </div>
+
+            <p class="text-[11px] text-slate-600 line-clamp-2">${w.bio}</p>
+
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] text-slate-400 block">Starting Fee</span>
+                    <span class="text-xs font-bold text-slate-900">Rs. ${w.startingPrice}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="openWorkerProfileModal(${w.id})" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200">
+                        Profile
+                    </button>
+                    <button onclick="directBookWorker(${w.id})" class="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-sm">
+                        Book Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    lucide.createIcons();
+}
+
+function scrollToCategories() {
+    document.getElementById('services-grid-anchor').scrollIntoView({ behavior: 'smooth' });
+}
+
+/* ==========================================================================
+   4. STEP-BY-STEP BOOKING WIZARD LOGIC
+   ========================================================================== */
+
+function openBookingWizard(categoryName) {
+    wizardData.step = 1;
+    wizardData.category = categoryName || 'Electrical';
+    wizardData.subService = SUB_SERVICES_MAP[wizardData.category] ? SUB_SERVICES_MAP[wizardData.category][0] : 'General Repair';
+    wizardData.description = '';
+    wizardData.photoUploaded = false;
+    wizardData.selectedWorker = null;
+
+    document.getElementById('booking-modal').classList.remove('hidden');
+    renderWizardStep();
+}
+
+function closeBookingModal() {
+    document.getElementById('booking-modal').classList.add('hidden');
+}
+
+function renderWizardStep() {
+    document.getElementById('wizard-step-num').innerText = wizardData.step;
+    document.getElementById('booking-modal-title').innerText = `Book ${wizardData.category} Service`;
+    
+    const container = document.getElementById('wizard-step-container');
+    const prevBtn = document.getElementById('wizard-prev-btn');
+    const nextBtn = document.getElementById('wizard-next-btn');
+
+    if(wizardData.step === 1) {
+        prevBtn.classList.add('hidden');
+        nextBtn.innerText = "Next: Problem & Location →";
+        
+        const subList = SUB_SERVICES_MAP[wizardData.category] || ['General Servicing', 'Inspection & Fix'];
+        
+        container.innerHTML = `
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-800 block mb-2">Select Sub-Service Required:</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        ${subList.map(sub => `
+                            <label class="p-3 border rounded-xl flex items-center justify-between cursor-pointer transition-all ${wizardData.subService === sub ? 'border-brand-600 bg-brand-50/50 font-bold text-brand-800' : 'border-slate-200 hover:bg-slate-50 text-xs'}">
+                                <span class="text-xs">${sub}</span>
+                                <input type="radio" name="sub_service_radio" value="${sub}" ${wizardData.subService === sub ? 'checked' : ''} onchange="wizardData.subService = this.value" class="accent-brand-600">
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 flex items-center gap-2">
+                    <i data-lucide="info" class="w-4 h-4 text-brand-600 flex-shrink-0"></i>
+                    <span>Estimated Initial Service Inspection Fee: <strong class="text-slate-900">Rs. 500</strong> (Parts cost additional if needed).</span>
+                </div>
+            </div>
+        `;
+    } else if(wizardData.step === 2) {
+        prevBtn.classList.remove('hidden');
+        nextBtn.innerText = "Next: Find Nearby Worker →";
+
+        container.innerHTML = `
+            <div class="space-y-4 text-xs">
+                <div>
+                    <label class="font-bold text-slate-800 block mb-1">Describe Your Issue (Optional):</label>
+                    <textarea id="wizard-problem-desc" placeholder="e.g. Ceiling fan in living room making squeaking noise and running slow..." class="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" rows="3">${wizardData.description}</textarea>
+                </div>
+
+                <div>
+                    <label class="font-bold text-slate-800 block mb-1">Attach Photo or Short Video (Optional):</label>
+                    <div onclick="toggleWizardPhoto()" class="border-2 border-dashed border-slate-200 hover:border-brand-500 rounded-xl p-4 text-center cursor-pointer bg-slate-50 transition-colors">
+                        <i data-lucide="${wizardData.photoUploaded ? 'check-circle-2' : 'camera'}" class="w-6 h-6 mx-auto mb-1 ${wizardData.photoUploaded ? 'text-emerald-500' : 'text-slate-400'}"></i>
+                        <span id="photo-upload-label" class="text-slate-600">${wizardData.photoUploaded ? '✓ Photo attached (ceiling_fan.jpg)' : 'Click to capture or upload photo'}</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="font-bold text-slate-800 block mb-1">Service Address (Bharatpur):</label>
+                    <input type="text" id="wizard-address-input" value="${wizardData.address}" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-semibold">
+                </div>
+
+                <div>
+                    <label class="font-bold text-slate-800 block mb-1">Preferred Time:</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" onclick="setWizardTime('ASAP', this)" class="p-2 border border-brand-600 bg-brand-50 rounded-xl text-center font-bold text-brand-800 text-xs">ASAP (30 min)</button>
+                        <button type="button" onclick="setWizardTime('Today 4 PM', this)" class="p-2 border border-slate-200 rounded-xl text-center text-xs hover:bg-slate-50">Today 4 PM</button>
+                        <button type="button" onclick="setWizardTime('Tomorrow 10 AM', this)" class="p-2 border border-slate-200 rounded-xl text-center text-xs hover:bg-slate-50">Tomorrow 10 AM</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    } else if(wizardData.step === 3) {
+        prevBtn.classList.remove('hidden');
+        nextBtn.innerText = "Confirm & Send Request";
+
+        // Find matching category workers
+        const matched = WORKERS.filter(w => w.category === wizardData.category);
+        const displayWorkers = matched.length ? matched : WORKERS.slice(0, 3);
+        if(!wizardData.selectedWorker) wizardData.selectedWorker = displayWorkers[0];
+
+        container.innerHTML = `
+            <div class="space-y-3">
+                <p class="text-xs font-bold text-slate-800">Select Verified Professional for ${wizardData.subService}:</p>
+                
+                <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                    ${displayWorkers.map(w => `
+                        <div onclick="selectWizardWorker(${w.id})" class="p-3 border rounded-xl cursor-pointer transition-all flex items-center justify-between ${wizardData.selectedWorker.id === w.id ? 'border-brand-600 bg-brand-50/60 ring-2 ring-brand-500/20' : 'border-slate-200 hover:bg-slate-50'}">
+                            <div class="flex items-center gap-3">
+                                <img src="${w.avatar}" class="w-10 h-10 rounded-lg object-cover">
+                                <div>
+                                    <h4 class="font-bold text-xs text-slate-900">${w.name}</h4>
+                                    <p class="text-[10px] text-slate-500">${w.locality} • ${w.distanceKm} km • ⭐ ${w.rating}</p>
+                                    <span class="text-[9px] bg-emerald-100 text-emerald-800 font-semibold px-1.5 py-0.2 rounded">✓ Govt ID Verified</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-bold text-brand-700 block">Rs. ${w.startingPrice}</span>
+                                <input type="radio" name="worker_choice" ${wizardData.selectedWorker.id === w.id ? 'checked' : ''} class="accent-brand-600">
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <!-- Price Calculator Breakdown -->
+                <div class="p-3 bg-slate-900 text-white rounded-xl space-y-1.5 text-xs">
+                    <div class="flex justify-between text-slate-300">
+                        <span>Base Service Charge:</span>
+                        <span>Rs. ${wizardData.selectedWorker.startingPrice}</span>
+                    </div>
+                    <div class="flex justify-between text-slate-300">
+                        <span>Estimated Platform & Safety Fee:</span>
+                        <span>Rs. 50</span>
+                    </div>
+                    <div class="border-t border-slate-700 pt-1.5 flex justify-between font-bold text-sm">
+                        <span>Estimated Total:</span>
+                        <span class="text-brand-400">Rs. ${wizardData.selectedWorker.startingPrice + 50}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    lucide.createIcons();
+}
+
+function toggleWizardPhoto() {
+    wizardData.photoUploaded = !wizardData.photoUploaded;
+    const label = document.getElementById('photo-upload-label');
+    if(label) {
+        label.innerText = wizardData.photoUploaded ? '✓ Photo attached (ceiling_fan.jpg)' : 'Click to capture or upload photo';
+    }
+}
+
+function setWizardTime(t, btn) {
+    wizardData.time = t;
+    showToast(`Time preference set to ${t}`);
+}
+
+function selectWizardWorker(id) {
+    wizardData.selectedWorker = WORKERS.find(w => w.id === id);
+    renderWizardStep();
+}
+
+function wizardStepNext() {
+    if(wizardData.step === 2) {
+        const descInput = document.getElementById('wizard-problem-desc');
+        if(descInput) wizardData.description = descInput.value;
+        const addrInput = document.getElementById('wizard-address-input');
+        if(addrInput) wizardData.address = addrInput.value;
+    }
+
+    if(wizardData.step < 3) {
+        wizardData.step++;
+        renderWizardStep();
+    } else {
+        // Finalize Booking
+        confirmBooking();
+    }
+}
+
+function wizardStepBack() {
+    if(wizardData.step > 1) {
+        wizardData.step--;
+        renderWizardStep();
+    }
+}
+
+function directBookWorker(workerId) {
+    const w = WORKERS.find(x => x.id === workerId);
+    if(w) {
+        openBookingWizard(w.category);
+        wizardData.selectedWorker = w;
+        wizardData.step = 2;
+        renderWizardStep();
+    }
+}
+
+/* ==========================================================================
+   5. BOOKING LIFECYCLE & LIVE TRACKER
+   ========================================================================== */
+
+function confirmBooking() {
+    closeBookingModal();
+    const w = wizardData.selectedWorker || WORKERS[0];
+    currentActiveWorkerId = w.id;
+
+    activeBooking = {
+        id: "UN-" + Math.floor(1000 + Math.random() * 9000),
+        worker: w,
+        service: wizardData.subService || wizardData.category,
+        address: wizardData.address,
+        time: wizardData.time,
+        status: 'Requested', // States: Requested -> Accepted -> On the Way -> Arrived -> Work Started -> Completed
+        estimatedTotal: w.startingPrice + 50,
+        quoteConfirmed: false,
+        paymentStatus: 'Pending'
+    };
+
+    renderCustomerActiveBookingBanner();
+    showToast(`Booking ${activeBooking.id} requested with ${w.name}!`);
+}
+
+function renderCustomerActiveBookingBanner() {
+    const container = document.getElementById('customer-active-booking-container');
+    if(!activeBooking) {
+        container.classList.add('hidden');
+        return;
+    }
+
+    container.classList.remove('hidden');
+
+    const steps = ['Requested', 'Accepted', 'On the Way', 'Arrived', 'Work Started', 'Completed'];
+    const currentIdx = steps.indexOf(activeBooking.status);
+
+    container.innerHTML = `
+        <div class="bg-white border-2 border-brand-500 rounded-2xl p-4 shadow-md space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-3">
+                    <img src="${activeBooking.worker.avatar}" class="w-11 h-11 rounded-xl object-cover border border-brand-500">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h4 class="font-bold text-xs text-slate-900">${activeBooking.service}</h4>
+                            <span class="text-[10px] bg-brand-100 text-brand-800 font-bold px-2 py-0.5 rounded-full">Booking #${activeBooking.id}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500">Assigned Professional: <strong class="text-slate-800">${activeBooking.worker.name}</strong></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="openChatModal(${activeBooking.worker.id})" class="px-3 py-1.5 bg-brand-50 text-brand-700 hover:bg-brand-100 rounded-xl text-xs font-bold flex items-center gap-1">
+                        <i data-lucide="message-square" class="w-3.5 h-3.5"></i> Chat / Call
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div>
+                <div class="flex justify-between text-[10px] font-bold text-slate-600 mb-2">
+                    <span class="${currentIdx >= 0 ? 'text-brand-700' : ''}">1. Requested</span>
+                    <span class="${currentIdx >= 1 ? 'text-brand-700' : ''}">2. Accepted</span>
+                    <span class="${currentIdx >= 2 ? 'text-brand-700' : ''}">3. On Way</span>
+                    <span class="${currentIdx >= 3 ? 'text-brand-700' : ''}">4. Arrived</span>
+                    <span class="${currentIdx >= 4 ? 'text-brand-700' : ''}">5. In Progress</span>
+                    <span class="${currentIdx >= 5 ? 'text-emerald-600' : ''}">6. Done</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden flex">
+                    <div class="bg-brand-600 h-full transition-all duration-500" style="width: ${((currentIdx + 1) / 6) * 100}%"></div>
+                </div>
+            </div>
+
+            <!-- Context Action Box based on Status -->
+            <div class="bg-slate-50 p-3 rounded-xl flex flex-col sm:flex-row items-center justify-between text-xs gap-2 border border-slate-200">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="clock" class="w-4 h-4 text-brand-600"></i>
+                    <span>Status: <strong class="text-slate-900">${activeBooking.status}</strong> (${activeBooking.address})</span>
+                </div>
+
+                ${activeBooking.status === 'Completed' && activeBooking.paymentStatus === 'Pending' ? `
+                    <button onclick="openPaymentModal()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow text-xs">
+                        Pay Rs. ${activeBooking.estimatedTotal} (eSewa / Cash)
+                    </button>
+                ` : ''}
+
+                ${activeBooking.status === 'Completed' && activeBooking.paymentStatus === 'Paid' ? `
+                    <span class="text-emerald-700 font-bold bg-emerald-100 px-3 py-1 rounded-lg">✓ Paid & Completed</span>
+                ` : ''}
+            </div>
+        </div>
+    `;
+    lucide.createIcons();
+}
+
+/* ==========================================================================
+   6. PROFESSIONAL VIEW & LIVE JOB MANAGER
+   ========================================================================== */
+
+function renderProIncomingRequest() {
+    const card = document.getElementById('pro-incoming-job-card');
+
+    if(activeBooking && activeBooking.status === 'Requested') {
+        card.innerHTML = `
+            <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-2">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="text-[10px] font-bold text-amber-800 bg-amber-200 px-2 py-0.5 rounded">NEW JOB REQUEST</span>
+                        <h4 class="font-bold text-xs text-slate-900 mt-1">${activeBooking.service}</h4>
+                        <p class="text-[11px] text-slate-600">Location: ${activeBooking.address}</p>
+                    </div>
+                    <span class="text-xs font-bold text-brand-800">Rs. ${activeBooking.estimatedTotal}</span>
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button onclick="proRespondJob(true)" class="flex-1 py-1.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg text-xs">Accept Job</button>
+                    <button onclick="proRespondJob(false)" class="flex-1 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg text-xs">Decline</button>
+                </div>
+            </div>
+        `;
+    } else {
+        card.innerHTML = `<p class="text-xs text-slate-400 py-2">No pending job invitations right now.</p>`;
+    }
+}
+
+function proRespondJob(accept) {
+    if(!activeBooking) return;
+    if(accept) {
+        activeBooking.status = 'Accepted';
+        showToast("Job Accepted! Customer notified.");
+    } else {
+        activeBooking = null;
+        showToast("Job Request Declined.");
+    }
+    renderProIncomingRequest();
+    renderProActiveJobPanel();
+    renderCustomerActiveBookingBanner();
+}
+
+function renderProActiveJobPanel() {
+    const panel = document.getElementById('pro-active-job-manager');
+
+    if(!activeBooking || activeBooking.status === 'Requested') {
+        panel.innerHTML = `<p class="text-xs text-slate-400 py-3">No active ongoing job. Turn duty status ONLINE to receive calls.</p>`;
+        return;
+    }
+
+    panel.innerHTML = `
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-3 text-xs">
+            <div class="flex justify-between font-bold">
+                <span>Active Booking: #${activeBooking.id}</span>
+                <span class="text-brand-700">${activeBooking.status}</span>
+            </div>
+            <p class="text-slate-600">Customer Address: ${activeBooking.address}</p>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                <button onclick="updateProStatus('On the Way')" class="p-2 bg-white border border-slate-300 hover:border-brand-600 rounded-lg font-semibold text-slate-800">1. On My Way</button>
+                <button onclick="updateProStatus('Arrived')" class="p-2 bg-white border border-slate-300 hover:border-brand-600 rounded-lg font-semibold text-slate-800">2. Arrived</button>
+                <button onclick="updateProStatus('Work Started')" class="p-2 bg-white border border-slate-300 hover:border-brand-600 rounded-lg font-semibold text-slate-800">3. Start Work</button>
+                <button onclick="updateProStatus('Completed')" class="p-2 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700">4. Mark Done</button>
+            </div>
+        </div>
+    `;
+}
+
+function updateProStatus(statusStr) {
+    if(!activeBooking) return;
+    activeBooking.status = statusStr;
+    showToast(`Status updated to: ${statusStr}`);
+    renderProActiveJobPanel();
+    renderCustomerActiveBookingBanner();
+}
+
+function toggleProDuty() {
+    const btn = document.getElementById('toggle-duty-btn');
+    if(btn.innerText === 'ONLINE') {
+        btn.innerText = 'OFFLINE';
+        btn.className = "px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-600 text-white transition-all";
+        showToast("Duty status set to OFFLINE");
+    } else {
+        btn.innerText = 'ONLINE';
+        btn.className = "px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500 text-white transition-all";
+        showToast("Duty status set to ONLINE");
+    }
+}
+
+/* ==========================================================================
+   7. LIVE CHAT MODAL
+   ========================================================================== */
+
+function openChatModal(workerId) {
+    const w = WORKERS.find(x => x.id === workerId) || WORKERS[0];
+    document.getElementById('chat-worker-name').innerText = w.name;
+    document.getElementById('chat-worker-avatar').src = w.avatar;
+    
+    const messages = document.getElementById('chat-messages-body');
+    messages.innerHTML = `
+        <div class="text-center text-[10px] text-slate-400 my-1">Conversation started with ${w.name}</div>
+        <div class="bg-white p-2.5 rounded-xl border border-slate-200 max-w-[80%] shadow-sm">
+            Hello! I am ${w.name}. I saw your request for ${w.category} service. Please share any details or house landmark.
+        </div>
+    `;
+    document.getElementById('chat-modal').classList.remove('hidden');
+}
+
+function closeChatModal() {
+    document.getElementById('chat-modal').classList.add('hidden');
+}
+
+function sendChatMessage() {
+    const input = document.getElementById('chat-input-text');
+    const txt = input.value.trim();
+    if(!txt) return;
+
+    const messages = document.getElementById('chat-messages-body');
+    messages.innerHTML += `
+        <div class="bg-brand-600 text-white p-2.5 rounded-xl max-w-[80%] ml-auto font-medium shadow-sm">
+            ${txt}
+        </div>
+    `;
+    input.value = '';
+    messages.scrollTop = messages.scrollHeight;
+
+    setTimeout(() => {
+        messages.innerHTML += `
+            <div class="bg-white p-2.5 rounded-xl border border-slate-200 max-w-[80%] shadow-sm text-slate-800">
+                Got it! I am reviewing the address near Bharatpur.
+            </div>
+        `;
+        messages.scrollTop = messages.scrollHeight;
+    }, 1200);
+}
+
+function sendQuickPhotoChat() {
+    const messages = document.getElementById('chat-messages-body');
+    messages.innerHTML += `
+        <div class="bg-brand-600 text-white p-2 rounded-xl max-w-[80%] ml-auto shadow-sm">
+            <span class="text-[10px] block opacity-80">Photo sent:</span>
+            📷 Attached photo of problem spot
+        </div>
+    `;
+    messages.scrollTop = messages.scrollHeight;
+}
+
+/* ==========================================================================
+   8. WORKER PROFILE DEEP VIEW
+   ========================================================================== */
+
+function openWorkerProfileModal(id) {
+    const w = WORKERS.find(x => x.id === id);
+    if(!w) return;
+
+    document.getElementById('profile-direct-book-btn').onclick = function() {
+        closeWorkerProfileModal();
+        directBookWorker(w.id);
+    };
+
+    const container = document.getElementById('worker-profile-content');
+    container.innerHTML = `
+        <div class="flex items-center gap-4 border-b border-slate-100 pb-4">
+            <img src="${w.avatar}" class="w-16 h-16 rounded-2xl object-cover border-2 border-brand-500">
+            <div>
+                <h3 class="font-bold text-base text-slate-900">${w.name}</h3>
+                <p class="text-xs text-brand-700 font-semibold">${w.subCat}</p>
+                <div class="flex items-center gap-2 mt-1 text-xs">
+                    <span class="text-amber-500 font-bold">⭐ ${w.rating}</span>
+                    <span class="text-slate-400">(${w.reviewsCount} reviews)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-3 text-xs">
+            <div>
+                <h4 class="font-bold text-slate-800 mb-1">About Professional</h4>
+                <p class="text-slate-600 leading-relaxed">${w.bio}</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <div>
+                    <span class="text-slate-400 block text-[10px]">Experience</span>
+                    <span class="font-bold text-slate-800">${w.experienceYears} Years</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 block text-[10px]">Completed Jobs</span>
+                    <span class="font-bold text-slate-800">${w.jobsCompleted}+ Jobs</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 block text-[10px]">Languages</span>
+                    <span class="font-bold text-slate-800">${w.languages.join(', ')}</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 block text-[10px]">Service Area</span>
+                    <span class="font-bold text-slate-800">${w.locality}</span>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-slate-800 mb-2">Verified Trust Credentials</h4>
+                <div class="space-y-1.5">
+                    <div class="flex items-center gap-2 text-emerald-700 font-medium">
+                        <i data-lucide="check-circle-2" class="w-4 h-4"></i> Phone & OTP Verified
+                    </div>
+                    <div class="flex items-center gap-2 text-emerald-700 font-medium">
+                        <i data-lucide="check-circle-2" class="w-4 h-4"></i> Nepal Citizenship Nagarikta Verified
+                    </div>
+                    <div class="flex items-center gap-2 text-blue-700 font-medium">
+                        <i data-lucide="award" class="w-4 h-4"></i> Certified Home Technician
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    lucide.createIcons();
+    document.getElementById('worker-profile-modal').classList.remove('hidden');
+}
+
+function closeWorkerProfileModal() {
+    document.getElementById('worker-profile-modal').classList.add('hidden');
+}
+
+/* ==========================================================================
+   9. PAYMENT FLOW (MOCK eSewa, KHALTI, CASH)
+   ========================================================================== */
+
+function openPaymentModal() {
+    if(!activeBooking) return;
+    activeBooking.paymentStatus = 'Paid';
+    renderCustomerActiveBookingBanner();
+    showToast("Payment completed successfully via eSewa!");
+}
+
+/* ==========================================================================
+   10. ADMIN DASHBOARD ACTIONS
+   ========================================================================== */
+
+function renderAdminVerificationQueue() {
+    const tbody = document.getElementById('admin-verification-table-body');
+    if(!pendingVerifications.length) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400">All worker verification queues are cleared!</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = pendingVerifications.map(p => `
+        <tr>
+            <td class="p-2.5 font-bold text-slate-900">${p.name}</td>
+            <td class="p-2.5">${p.category}</td>
+            <td class="p-2.5 font-mono text-slate-500">${p.citizenship}</td>
+            <td class="p-2.5 text-brand-700 underline cursor-pointer">${p.docs}</td>
+            <td class="p-2.5">
+                <button onclick="approveWorkerVerification(${p.id})" class="px-2.5 py-1 bg-emerald-600 text-white font-bold rounded text-[10px] hover:bg-emerald-700">Approve</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function approveWorkerVerification(id) {
+    pendingVerifications = pendingVerifications.filter(p => p.id !== id);
+    renderAdminVerificationQueue();
+    showToast("Worker verification approved! Badge granted.");
+}
+
+function updateCommissionRate(val) {
+    currentPlatformCommission = val;
+    document.getElementById('commission-display-val').innerText = `${val}%`;
+}
+
+function triggerWithdraw(method) {
+    showToast(`Withdrawal request submitted to ${method}!`);
+}
+
+function openProKycModal() {
+    document.getElementById('pro-kyc-modal').classList.remove('hidden');
+}
+
+function closeProKycModal() {
+    document.getElementById('pro-kyc-modal').classList.add('hidden');
+}
+
+function submitKycDocs() {
+    closeProKycModal();
+    showToast("KYC Documents submitted for verification review!");
+}
+
+function openCustomerActiveBookingsModal() {
+    if(activeBooking) {
+        switchRole('customer');
+        scrollToCategories();
+        showToast(`Viewing active booking #${activeBooking.id}`);
+    } else {
+        showToast("No active booking right now.");
+    }
+}
+</script>
+</body>
+</html>
